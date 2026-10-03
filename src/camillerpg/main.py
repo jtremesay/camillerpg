@@ -20,6 +20,11 @@ from collections.abc import Iterable
 
 from dotenv import load_dotenv
 
+try:
+    import logfire
+except ImportError:
+    logfire = None
+
 from .mattermost import cmd_mattermost_register
 
 _COMMANDS = {
@@ -41,6 +46,11 @@ def main(args: Iterable[str] | None = None):
 
     # Load environment variables from the specified file
     load_dotenv(parsed_args.env_file)
+
+    if logfire is not None:
+        logfire.configure(send_to_logfire="if-token-present")
+        logfire.instrument_httpx()
+        logfire.instrument_pydantic_ai()
 
     # Execute the appropriate command function if specified
     if func := getattr(parsed_args, "func", None):
