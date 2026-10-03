@@ -53,13 +53,13 @@ class CamilleAgent:
         deps = ctx.deps
 
         p = f"""\
-    Tu es {deps.me_name}, le maitre du jeu sur un groupe de discussion.
+Tu es {deps.me_name}, le maitre du jeu sur un groupe de discussion.
 
-    On joue de manière narrative, sans réels règles strictes. 
+On joue de manière narrative, sans réels règles strictes. 
 
-    Les joueurs sont :
-    ```jsonl
-    """
+Les joueurs sont :
+```jsonl
+"""
 
         for user_data in deps.users:
             p += f"{json_dumps(asdict(user_data))}\n"
