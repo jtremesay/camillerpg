@@ -14,11 +14,36 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+import asyncio
 from argparse import ArgumentParser
 from collections.abc import Iterable
+
+from dotenv import load_dotenv
+
+from .mattermost import cmd_mattermost_register
+
+_COMMANDS = {
+    "mattermost": cmd_mattermost_register,
+}
 
 
 def main(args: Iterable[str] | None = None):
     parser = ArgumentParser()
-    # Add your argument definitions here
+    parser.add_argument("-e", "--env-file", help="Path to the environment file")
+
+    # Set up the argument parser and sub-commands
+    sub_parsers = parser.add_subparsers(dest="command")
+    for command, register_func in _COMMANDS.items():
+        register_func(sub_parsers.add_parser(command))
+
+    # Parse the command-line arguments
     parsed_args = parser.parse_args(args)
+
+    # Load environment variables from the specified file
+    load_dotenv(parsed_args.env_file)
+
+    # Execute the appropriate command function if specified
+    if func := getattr(parsed_args, "func", None):
+        asyncio.run(func(parsed_args))
+    else:
+        parser.print_help()

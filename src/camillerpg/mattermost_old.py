@@ -1,0 +1,66 @@
+# CamilleRPG - An AI assistant
+# Copyright (C) Jonathan Tremesaygues <jonathan@tremesaygues.eu>
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+from typing import cast
+
+from httpx2 import AsyncClient
+
+
+async def get_json(client: AsyncClient, url: str) -> dict | list:
+    return (await client.get(url)).json()
+
+
+async def get_user(client: AsyncClient, u_id: str) -> dict:
+    user = cast(dict, await get_json(client, f"/users/{u_id}"))
+
+    return {
+        "id": user["id"],
+        "username": user["username"],
+        "first_name": user["first_name"],
+        "last_name": user["last_name"],
+        "nickname": user["nickname"],
+    }
+
+
+async def get_channels_for_user(client: AsyncClient, user_id: str) -> list[str]:
+    memberships = await get_json(client, f"/users/{user_id}/channels")
+
+    return [m["id"] for m in memberships]
+
+
+async def get_channel_members(
+    client: AsyncClient, channel_id: str, me_id: str
+) -> list[str]:
+    members = await get_json(client, f"/channels/{channel_id}/members")
+    return [m["user_id"] for m in members if m["user_id"] != me_id]
+
+
+async def get_users_and_members(
+    client: AsyncClient, me_id: str
+) -> tuple[dict[str, dict], dict[str, list[str]]]:
+
+    users: dict[str, dict] = {}
+    channel_members: dict[str, list[str]] = {}
+
+    for channel_id in await get_channels_for_user(client, me_id):
+        members = await get_channel_members(client, channel_id, me_id)
+        channel_members[channel_id] = members
+
+        for user_id in members:
+            if user_id not in users:
+                users[user_id] = await get_user(client, user_id)
+
+    return users, channel_members

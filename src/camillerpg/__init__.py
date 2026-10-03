@@ -24,7 +24,7 @@ from dotenv import load_dotenv
 from httpx2 import AsyncClient
 
 from .agent import Deps, get_agent, read_history, write_history
-from .mattermost import get_user, get_users_and_members
+from .mattermost_old import get_user, get_users_and_members
 
 
 async def arun(mattermost_base_url: str, mattermost_token: str) -> None:
