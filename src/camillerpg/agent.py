@@ -21,9 +21,8 @@ def system_prompt(ctx: RunContext[Deps]) -> str:
 
     p = f"""\
 Tu es {me_name}, le maitre du jeu sur un channel Mattermost de jeu de role.
-L'univers est de jeu est Shadowrun.
-Le système de jeu est quasi exclusivement narratif.
-Pas vraiment de règles ou de mécanismes stricts, l'accent est mis sur la narration.
+
+On joue de manière narrative, sans réels règles strictes. 
 
 Les joueurs sont :
 ```jsonl

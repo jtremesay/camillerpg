@@ -35,48 +35,56 @@ async def arun(mattermost_base_url: str, mattermost_token: str) -> None:
                 event_data = msg["data"]
                 post_data = json_loads(event_data["post"])
 
-                print(post_data)
-
-                return
-                if post_data["root_id"]:
-                    continue
-
-                post_message = post_data["message"]
-                if not "@" + me_name in post_message:
+                message = post_data["message"]
+                if (
+                    not "@" + me_name in message
+                ):  # Ignore messages that do not mention the bot
                     continue
 
                 channel_id = post_data["channel_id"]
+                thread_id = post_data["root_id"] or post_data["id"]
 
+                # Build the list of users in the current channel
                 users_in_channel = [
                     users[user_id] for user_id in channel_members[channel_id]
                 ]
+
+                # Build the dependencies for the agent
                 deps = Deps(
                     me_name=me_first_name,
                     users=users_in_channel,
                 )
 
-                history = await read_history(channel_id, "")
+                # Load the conversation history for the current thread
+                history = await read_history(channel_id, thread_id)
 
+                # Build the prompt for the agent
                 prompt = json_dumps(
                     {
                         "user": users[post_data["user_id"]]["username"],
-                        "message": post_message,
+                        "message": message,
                     }
                 )
+
+                # Run the agent with the constructed prompt and dependencies
                 r = await agent.run(
                     prompt,
                     deps=deps,
                     message_history=history,
                 )
+
+                # Send the agent's response as a reply in the current thread
                 await client.post(
                     "/posts",
                     json={
                         "channel_id": channel_id,
+                        "root_id": thread_id,
                         "message": r.output,
                     },
                 )
 
-                await write_history(channel_id, "", r.all_messages())
+                # Save the updated conversation history for the current thread
+                await write_history(channel_id, thread_id, r.all_messages())
 
 
 def main() -> None:
