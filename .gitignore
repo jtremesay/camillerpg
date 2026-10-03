@@ -11,3 +11,6 @@ wheels/
 
 # Environment variables
 .env
+
+# History files
+history_*.json
