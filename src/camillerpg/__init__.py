@@ -27,9 +27,10 @@ async def arun(mattermost_base_url: str, mattermost_token: str) -> None:
         users, channel_members = await get_users_and_members(client, me_id)
 
         async with client.websocket("/websocket") as ws:
+            ws_seq = 0
             while True:
                 msg = await ws.receive_json()
-                if msg["event"] != "posted":
+                if msg.get("event") != "posted":
                     continue
 
                 event_data = msg["data"]
@@ -63,6 +64,19 @@ async def arun(mattermost_base_url: str, mattermost_token: str) -> None:
                     {
                         "user": users[post_data["user_id"]]["username"],
                         "message": message,
+                    }
+                )
+
+                # Notify the channel that the bot is "typing"
+                ws_seq += 1
+                await ws.send_json(
+                    {
+                        "action": "user_typing",
+                        "seq": ws_seq,
+                        "data": {
+                            "channel_id": channel_id,
+                            "parent_id": thread_id,
+                        },
                     }
                 )
 
