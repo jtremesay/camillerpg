@@ -39,20 +39,33 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "aiofiles" },
-    { name = "httpx2", extra = ["ws"] },
     { name = "pydantic-ai-harness" },
-    { name = "pydantic-ai-slim", extra = ["google", "logfire"] },
+    { name = "pydantic-ai-slim" },
     { name = "python-dotenv" },
+]
+
+[package.optional-dependencies]
+google = [
+    { name = "pydantic-ai-slim", extra = ["google"] },
+]
+logfire = [
+    { name = "pydantic-ai-slim", extra = ["logfire"] },
+]
+mattermost = [
+    { name = "httpx2", extra = ["ws"] },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "aiofiles", specifier = ">=25.1.0" },
-    { name = "httpx2", extras = ["ws"], specifier = ">=2.13.1" },
-    { name = "pydantic-ai-harness", specifier = ">=0.54.0" },
-    { name = "pydantic-ai-slim", extras = ["google", "logfire"], specifier = ">=2.52.0" },
-    { name = "python-dotenv", specifier = ">=1.2.4" },
+    { name = "aiofiles" },
+    { name = "httpx2", extras = ["ws"], marker = "extra == 'mattermost'" },
+    { name = "pydantic-ai-harness" },
+    { name = "pydantic-ai-slim" },
+    { name = "pydantic-ai-slim", extras = ["google"], marker = "extra == 'google'" },
+    { name = "pydantic-ai-slim", extras = ["logfire"], marker = "extra == 'logfire'" },
+    { name = "python-dotenv" },
 ]
+provides-extras = ["mattermost", "logfire", "google"]
 
 [[package]]
 name = "certifi"

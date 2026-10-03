@@ -9,12 +9,16 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
-    "aiofiles>=25.1.0",
-    "httpx2[ws]>=2.13.1",
-    "pydantic-ai-harness>=0.54.0",
-    "pydantic-ai-slim[google,logfire]>=2.52.0",
-    "python-dotenv>=1.2.4",
+    "aiofiles",
+    "pydantic-ai-harness",
+    "pydantic-ai-slim",
+    "python-dotenv",
 ]
+
+[project.optional-dependencies]
+mattermost = ["httpx2[ws]"]
+logfire = ["pydantic-ai-slim[logfire]"]
+google = ["pydantic-ai-slim[google]"]
 
 [project.scripts]
 camillerpg = "camillerpg.main:main"
