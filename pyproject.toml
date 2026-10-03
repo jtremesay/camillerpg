@@ -10,6 +10,7 @@ requires-python = ">=3.14"
 dependencies = [
     "aiofiles>=25.1.0",
     "httpx2[ws]>=2.13.1",
+    "pydantic-ai-harness>=0.54.0",
     "pydantic-ai-slim[google,logfire]>=2.52.0",
     "python-dotenv>=1.2.4",
 ]
