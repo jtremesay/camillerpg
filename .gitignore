@@ -13,4 +13,4 @@ wheels/
 .env
 
 # History files
-history_*.json
+.history/

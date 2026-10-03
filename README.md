@@ -40,6 +40,8 @@ $ uv sync --extra google
 
 CamilleRPG is configured through environment variables. You can use a `.env` file to set them conveniently. (or `camillerpg -e <.env file>` command).
 
+- `CAMILLE_MODEL` - The model to use for CamilleRPG. See here for available models: https://pydantic.dev/docs/ai/models/overview/. Required
+- `CAMILLE_MODEL_COMPACTION` - The model used for compacting the history of long conversations. Use $CAMILLE_MODEL if not specified.
 - `MATTERMOST_BASE_URL` - The base URL of your Mattermost instance. Required if using Mattermost integration.
 - `MATTERMOST_TOKEN` - The API key for your Mattermost instance. Required if using Mattermost integration.
 - `GOOGLE_API_KEY` - The API key for using the Google Generative Language API. Required if using Google GLA integration.
