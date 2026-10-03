@@ -45,6 +45,7 @@ class MattermostAgent(CamilleAgent):
         self.client = AsyncClient(
             base_url=base_url + "/api/v4", headers={"Authorization": "Bearer " + token}
         )
+        self.ws: AsyncWebSocketSession | None = None
         self.ws_seq = 0
 
     async def __aenter__(self) -> Self:
@@ -123,6 +124,32 @@ class MattermostAgent(CamilleAgent):
 
         return users, channels_users
 
+    async def post_message(self, channel_id: str, thread_id: str, message: str) -> None:
+        await self.client.post(
+            "/posts",
+            json={
+                "channel_id": channel_id,
+                "root_id": thread_id,
+                "message": message,
+            },
+        )
+
+    async def send_typing(self, channel_id: str, thread_id: str) -> None:
+        if self.ws is None:
+            return
+
+        self.ws_seq += 1
+        await self.ws.send_json(
+            {
+                "action": "user_typing",
+                "seq": self.ws_seq,
+                "data": {
+                    "channel_id": channel_id,
+                    "parent_id": thread_id,
+                },
+            }
+        )
+
     async def arun(self) -> None:
         # Fetch the current user's information, the channels they are members of, and the users in those channels
         me = await self.get_user("me")
@@ -132,13 +159,15 @@ class MattermostAgent(CamilleAgent):
         # Connect to the Mattermost WebSocket
         async with self.client.websocket("/websocket") as ws:
             while True:
+                # Receive a message from the Mattermost WebSocket
                 msg = await ws.receive_json()
+
+                # Ignore any events that are not new posts
                 if msg.get("event") != "posted":
                     continue
 
                 event_data = msg["data"]
                 post_data = json_loads(event_data["post"])
-
                 message = post_data["message"]
                 if (
                     not me_mention in message
@@ -165,35 +194,13 @@ class MattermostAgent(CamilleAgent):
                 )
 
                 # Notify the channel that the bot is "typing"
-                await self.send_typing(ws, channel_id, thread_id)
+                await self.send_typing(channel_id, thread_id)
 
                 # Run the agent with the constructed prompt and dependencies
                 r = await self.infer(prompt, deps=deps, conversation_id=thread_id)
 
                 # Send the agent's response as a reply in the current thread
-                await self.client.post(
-                    "/posts",
-                    json={
-                        "channel_id": channel_id,
-                        "root_id": thread_id,
-                        "message": r.output,
-                    },
-                )
-
-    async def send_typing(
-        self, ws: AsyncWebSocketSession, channel_id: str, thread_id: str
-    ) -> None:
-        self.ws_seq += 1
-        await ws.send_json(
-            {
-                "action": "user_typing",
-                "seq": self.ws_seq,
-                "data": {
-                    "channel_id": channel_id,
-                    "parent_id": thread_id,
-                },
-            }
-        )
+                await self.post_message(channel_id, thread_id, r.output)
 
 
 def cmd_mattermost_register(parser: ArgumentParser) -> None:
