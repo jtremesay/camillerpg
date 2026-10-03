@@ -17,8 +17,11 @@ dependencies = [
 
 [project.optional-dependencies]
 mattermost = ["httpx2[ws]"]
-logfire = ["pydantic-ai-slim[logfire]"]
+anthropic = ["pydantic-ai-slim[anthropic]"]
+bedrock = ["pydantic-ai-slim[bedrock]"]
 google = ["pydantic-ai-slim[google]"]
+ollama = ["pydantic-ai-slim[ollama]"]
+logfire = ["pydantic-ai-slim[logfire]"]
 
 [project.scripts]
 camillerpg = "camillerpg.main:main"
