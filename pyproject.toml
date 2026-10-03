@@ -20,7 +20,7 @@ mattermost = ["httpx2[ws]"]
 anthropic = ["pydantic-ai-slim[anthropic]"]
 bedrock = ["pydantic-ai-slim[bedrock]"]
 google = ["pydantic-ai-slim[google]"]
-ollama = ["pydantic-ai-slim[ollama]"]
+ollama = ["pydantic-ai-slim[openai]"]
 logfire = ["pydantic-ai-slim[logfire]"]
 
 [project.scripts]
