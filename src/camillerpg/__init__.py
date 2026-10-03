@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from json import dumps as json_dumps
 from json import loads as json_loads
 from os import environ
-from shutil import move
 from typing import cast
 
 import logfire
