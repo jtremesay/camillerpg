@@ -1,10 +1,11 @@
 [project]
 name = "camillerpg"
 version = "0.1.0"
-description = "Add your description here"
+description = "A game master bot for animating your tabletop RPG sessions"
 readme = "README.md"
+license = "AGPL-3.0-or-later"
 authors = [
-    { name = "Jonathan Tremesaygues", email = "jonathan.tremesaygues@slaanesh.org" }
+    { name = "Jonathan Tremesaygues", email = "jonathan@tremesaygues.eu" },
 ]
 requires-python = ">=3.14"
 dependencies = [
@@ -16,7 +17,7 @@ dependencies = [
 ]
 
 [project.scripts]
-camillerpg = "camillerpg:main"
+camillerpg = "camillerpg.main:main"
 
 [build-system]
 requires = ["uv_build>=0.12.21,<0.13.0"]
