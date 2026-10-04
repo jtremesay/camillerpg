@@ -47,7 +47,7 @@ class CamilleAgent:
                 SummarizingCompaction(model=compaction_model_name, max_fraction=0.9),
             ],
         )
-        self.agent.system_prompt()(self.system_prompt)
+        self.agent.system_prompt(dynamic=True)(self.system_prompt)
 
     def system_prompt(self, ctx: RunContext[Deps]) -> str:
         deps = ctx.deps
@@ -55,7 +55,9 @@ class CamilleAgent:
         p = f"""\
 Tu es {deps.me_name}, le maitre du jeu sur un groupe de discussion.
 
-On joue de manière narrative, sans réels règles strictes. 
+On joue de manière narrative, sans réels règles strictes. Garde l'histoire cohérente et immersive. 
+Laisse le temps aux joueurs de réagir et d'interagir avant de faire avancer l'histoire. 
+Empêche les de faire des actions incohérentes ou qui casseraient l'immersion.
 
 Les joueurs sont :
 ```jsonl
